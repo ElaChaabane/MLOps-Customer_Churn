@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/edf5fe4727a7454896d7fe103496a35f/artifacts
+end_time: 1740150963322
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: edf5fe4727a7454896d7fe103496a35f
+run_name: judicious-sheep-456
+run_uuid: edf5fe4727a7454896d7fe103496a35f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740150961239
+status: 4
+tags: []
+user_id: elachaabane

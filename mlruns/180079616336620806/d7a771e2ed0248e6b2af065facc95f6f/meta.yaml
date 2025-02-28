@@ -1,0 +1,15 @@
+artifact_uri: file:///home/elachaabane/ela_chaabane_4ds2_ml_project/mlruns/180079616336620806/d7a771e2ed0248e6b2af065facc95f6f/artifacts
+end_time: 1740149996973
+entry_point_name: ''
+experiment_id: '180079616336620806'
+lifecycle_stage: active
+run_id: d7a771e2ed0248e6b2af065facc95f6f
+run_name: Train_Model
+run_uuid: d7a771e2ed0248e6b2af065facc95f6f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740149993781
+status: 3
+tags: []
+user_id: elachaabane

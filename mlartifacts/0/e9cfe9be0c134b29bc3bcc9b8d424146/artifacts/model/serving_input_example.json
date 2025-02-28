@@ -1,0 +1,50 @@
+{
+  "dataframe_split": {
+    "columns": [
+      "State_0",
+      "State_1",
+      "State_2",
+      "State_3",
+      "State_4",
+      "State_5",
+      "Account length",
+      "Area code",
+      "International plan",
+      "Voice mail plan",
+      "Number vmail messages",
+      "Total day minutes",
+      "Total day calls",
+      "Total eve minutes",
+      "Total eve calls",
+      "Total night minutes",
+      "Total night calls",
+      "Total intl minutes",
+      "Total intl calls",
+      "Customer service calls"
+    ],
+    "data": [
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.6225490196078431,
+        0.06862745098039191,
+        0.0,
+        1.0,
+        0.5319148936170213,
+        0.7987355110642782,
+        0.6000000000000001,
+        0.4923691860465116,
+        0.4811320754716981,
+        0.6683861459100958,
+        0.41346153846153844,
+        0.471830985915493,
+        0.30000000000000004,
+        0.3333333333333333
+      ]
+    ]
+  }
+}

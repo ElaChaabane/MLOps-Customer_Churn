@@ -1,0 +1,14 @@
+numpy
+pandas
+scikit-learn
+matplotlib
+xgboost
+lightgbm
+jupyter
+mlflow
+seaborn
+category-encoders
+fastapi
+uvicorn 
+joblib
+
