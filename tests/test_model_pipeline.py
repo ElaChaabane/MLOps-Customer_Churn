@@ -19,8 +19,8 @@ from model_pipeline import (
 def test_prepare_data():
     """Test the data preparation function"""
     # Use full paths to the test CSV files
-    train_path = os.path.expanduser("~/ela_chaabane_4ds2_ml_project/churn-bigml-80.csv")
-    test_path = os.path.expanduser("~/ela_chaabane_4ds2_ml_project/churn-bigml-20.csv")
+    train_path = os.path.join(os.path.dirname(__file__), '..', 'churn-bigml-80.csv')
+    test_path = os.path.join(os.path.dirname(__file__), '..', 'churn-bigml-20.csv')
     
     # Prepare data using explicit paths
     X_train, y_train, X_test, y_test = prepare_data(train_path, test_path)
@@ -48,14 +48,15 @@ def test_impute_outliers():
     columns_to_impute = ['A']
     df_imputed = impute_outliers(df, columns_to_impute)
     
-    # Check that outliers have been replaced with mean
+    # Check that outliers have been replaced with an appropriate method
     assert df_imputed['A'].mean() == pytest.approx(df['A'].mean())
 
 def test_model_training_and_evaluation():
     """Test model training and evaluation workflow"""
     # Prepare data
-    train_path = os.path.expanduser("~/ela_chaabane_4ds2_ml_project/churn-bigml-80.csv")
-    test_path = os.path.expanduser("~/ela_chaabane_4ds2_ml_project/churn-bigml-20.csv")
+    train_path = os.path.join(os.path.dirname(__file__), '..', 'churn-bigml-80.csv')
+    test_path = os.path.join(os.path.dirname(__file__), '..', 'churn-bigml-20.csv')
+    
     X_train, y_train, X_test, y_test = prepare_data(train_path, test_path)
     
     # Train model
@@ -70,8 +71,9 @@ def test_model_training_and_evaluation():
 def test_model_save_and_load():
     """Test model saving and loading"""
     # Prepare data and train model
-    train_path = os.path.expanduser("~/ela_chaabane_4ds2_ml_project/churn-bigml-80.csv")
-    test_path = os.path.expanduser("~/ela_chaabane_4ds2_ml_project/churn-bigml-20.csv")
+    train_path = os.path.join(os.path.dirname(__file__), '..', 'churn-bigml-80.csv')
+    test_path = os.path.join(os.path.dirname(__file__), '..', 'churn-bigml-20.csv')
+    
     X_train, y_train, X_test, y_test = prepare_data(train_path, test_path)
     model = train_model(X_train, y_train)
     
@@ -85,5 +87,4 @@ def test_model_save_and_load():
     y_pred = loaded_model.predict(X_test)
     assert len(y_pred) == len(X_test)
     
-    # Clean up test model file
-    os.remove("test_model.joblib")
+    
