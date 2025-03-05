@@ -42,7 +42,7 @@ train:
 # Step 5: Run basic tests
 test:
 	@echo "🔄 Running tests..."
-	. $(VENV_DIR)/bin/activate && pytest tests/
+	. $(VENV_DIR)/bin/activate && python -m pytest tests/test_model_pipeline.py -v
 	@echo "✅ Tests complete."
 
 # Step 6: Evaluate the trained model

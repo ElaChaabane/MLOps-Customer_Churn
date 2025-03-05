@@ -2,7 +2,6 @@ numpy
 pandas
 scikit-learn
 matplotlib
-xgboost
 lightgbm
 jupyter
 mlflow
@@ -11,4 +10,8 @@ category-encoders
 fastapi
 uvicorn 
 joblib
-
+seaborn
+pytest
+black
+flake8
+bandit
