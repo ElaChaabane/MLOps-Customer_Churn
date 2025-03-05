@@ -6,7 +6,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from model_pipeline import evaluate_model
-from sklearn.ensemble import GradientBoostingClassifier
+import lightgbm as lgb
 
 def test_evaluate_model():
     """Test model evaluation using dummy data"""
@@ -18,8 +18,8 @@ def test_evaluate_model():
     X_test = np.random.rand(50, 8)  # 50 samples, 8 features
     y_test = np.random.randint(0, 2, 50)  # Binary labels (0 or 1)
 
-    # Train the model
-    model = GradientBoostingClassifier(random_state=42)
+       # Train the model using LightGBM
+    model = lgb.LGBMClassifier(random_state=42)
     model.fit(X_train, y_train)
 
     # Evaluate the model

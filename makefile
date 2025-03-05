@@ -44,6 +44,26 @@ test:
 	@echo "🔄 Running tests..."
 	. $(VENV_DIR)/bin/activate && python -m pytest tests/test_model_pipeline.py -v
 	@echo "✅ Tests complete."
+# Additional specific test targets
+test-data-preparation:
+	@echo "🔍 Running data preparation tests..."
+	. $(VENV_DIR)/bin/activate && python -m pytest tests/test_data_preparation.py -v
+	@echo "✅ Data preparation tests complete."
+
+test-model-evaluation:
+	@echo "🔍 Running model evaluation tests..."
+	. $(VENV_DIR)/bin/activate && python -m pytest tests/test_model_evaluation.py -v
+	@echo "✅ Model evaluation tests complete."
+
+test-performance:
+	@echo "🔍 Running performance tests..."
+	. $(VENV_DIR)/bin/activate && python -m pytest tests/test_model_performance.py -v
+	@echo "✅ Performance tests complete."
+
+test-integration:
+	@echo "🔍 Running integration tests..."
+	. $(VENV_DIR)/bin/activate && python -m pytest tests/test_integration.py -v
+	@echo "✅ Integration tests complete."
 
 # Step 6: Evaluate the trained model
 evaluate:
