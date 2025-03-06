@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Churn Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 2rem;
+            background-color: #f8f9fa;
+        }
+        .form-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .result-container {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 5px;
+            display: none;
+        }
+        .churn {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .no-churn {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="text-center mb-4">Customer Churn Prediction</h1>
+                <div class="form-container">
+                    <form id="predictionForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="account_length" class="form-label">Account Length</label>
+                                <input type="number" class="form-control" id="account_length" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="number_vmail_messages" class="form-label">Number of Voicemail Messages</label>
+                                <input type="number" class="form-control" id="number_vmail_messages" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="total_day_minutes" class="form-label">Total Day Minutes</label>
+                                <input type="number" step="0.1" class="form-control" id="total_day_minutes" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="total_day_calls" class="form-label">Total Day Calls</label>
+                                <input type="number" class="form-control" id="total_day_calls" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="total_eve_minutes" class="form-label">Total Evening Minutes</label>
+                                <input type="number" step="0.1" class="form-control" id="total_eve_minutes" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="total_eve_calls" class="form-label">Total Evening Calls</label>
+                                <input type="number" class="form-control" id="total_eve_calls" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="total_night_minutes" class="form-label">Total Night Minutes</label>
+                                <input type="number" step="0.1" class="form-control" id="total_night_minutes" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="total_night_calls" class="form-label">Total Night Calls</label>
+                                <input type="number" class="form-control" id="total_night_calls" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="total_intl_minutes" class="form-label">Total International Minutes</label>
+                                <input type="number" step="0.1" class="form-control" id="total_intl_minutes" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="total_intl_calls" class="form-label">Total International Calls</label>
+                                <input type="number" class="form-control" id="total_intl_calls" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="customer_service_calls" class="form-label">Customer Service Calls</label>
+                                <input type="number" class="form-control" id="customer_service_calls" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Plans</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="international_plan">
+                                    <label class="form-check-label" for="international_plan">
+                                        International Plan
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="voice_mail_plan">
+                                    <label class="form-check-label" for="voice_mail_plan">
+                                        Voice Mail Plan
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">State</label>
+                            <select class="form-select" id="state" required>
+                                <option value="" selected disabled>Select State</option>
+                                <option value="0">State 0</option>
+                                <option value="1">State 1</option>
+                                <option value="2">State 2</option>
+                                <option value="3">State 3</option>
+                                <option value="4">State 4</option>
+                                <option value="5">State 5</option>
+                                <option value="6">State 6</option>
+                            </select>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Predict Churn</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="resultContainer" class="result-container">
+                    <h3 class="text-center" id="predictionResult"></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get state value and create state encoding
+            const stateValue = document.getElementById('state').value;
+            const stateEncoding = {
+                state_0: 0,
+                state_1: 0, 
+                state_2: 0,
+                state_3: 0,
+                state_4: 0,
+                state_5: 0,
+                state_6: 0
+            };
+            
+            stateEncoding[`state_${stateValue}`] = 1;
+            
+            const data = {
+                account_length: parseInt(document.getElementById('account_length').value),
+                number_vmail_messages: parseInt(document.getElementById('number_vmail_messages').value),
+                total_day_minutes: parseFloat(document.getElementById('total_day_minutes').value),
+                total_day_calls: parseInt(document.getElementById('total_day_calls').value),
+                total_eve_minutes: parseFloat(document.getElementById('total_eve_minutes').value),
+                total_eve_calls: parseInt(document.getElementById('total_eve_calls').value),
+                total_night_minutes: parseFloat(document.getElementById('total_night_minutes').value),
+                total_night_calls: parseInt(document.getElementById('total_night_calls').value),
+                total_intl_minutes: parseFloat(document.getElementById('total_intl_minutes').value),
+                total_intl_calls: parseInt(document.getElementById('total_intl_calls').value),
+                customer_service_calls: parseInt(document.getElementById('customer_service_calls').value),
+                international_plan: document.getElementById('international_plan').checked ? 1 : 0,
+                voice_mail_plan: document.getElementById('voice_mail_plan').checked ? 1 : 0,
+                state_0: stateEncoding.state_0,
+                state_1: stateEncoding.state_1,
+                state_2: stateEncoding.state_2,
+                state_3: stateEncoding.state_3,
+                state_4: stateEncoding.state_4,
+                state_5: stateEncoding.state_5,
+                state_6: stateEncoding.state_6
+            };
+            
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultContainer = document.getElementById('resultContainer');
+                const predictionResult = document.getElementById('predictionResult');
+                
+                resultContainer.style.display = 'block';
+                predictionResult.innerText = data.prediction;
+                
+                if (data.prediction === 'Customer Will Churn') {
+                    resultContainer.className = 'result-container churn';
+                } else {
+                    resultContainer.className = 'result-container no-churn';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while making the prediction.');
+            });
+        });
+    </script>
+</body>
+</html>

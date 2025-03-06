@@ -139,3 +139,31 @@ clean:
 
 	# Remove the Docker image to free up space
 	docker rmi -f $(IMAGE_NAME):$(TAG) || true
+
+
+
+# Add these targets to your existing Makefile
+
+# Run Flask application
+flask:
+	@echo "🔄 Starting the Flask server..."
+	. $(VENV_DIR)/bin/activate && python flask_app.py
+
+# Run FastAPI test client
+fastapi_test:
+	@echo "🔄 Starting the FastAPI test client..."
+	. $(VENV_DIR)/bin/activate && uvicorn fastapi_test:app --reload --host 0.0.0.0 --port 8000
+
+# Run both servers (Flask and FastAPI test client)
+run_both:
+	@echo "🔄 Starting both servers..."
+	. $(VENV_DIR)/bin/activate && python flask_app.py & \
+	. $(VENV_DIR)/bin/activate && uvicorn fastapi_test:app --host 0.0.0.0 --port 8000
+	@echo "✅ Flask app running on http://localhost:5000"
+	@echo "✅ FastAPI test client running on http://localhost:8000"
+
+# Create directories and setup initial files
+setup_files:
+	@echo "🔄 Creating project directories..."
+	mkdir -p templates
+	@echo "✅ Project structure created."

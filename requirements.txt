@@ -15,3 +15,5 @@ pytest
 black
 flake8
 bandit
+flask
+jinja2
