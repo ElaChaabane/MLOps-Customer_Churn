@@ -57,12 +57,17 @@ test-model-evaluation:
 
 test-performance:
 	@echo "🔍 Running performance tests..."
-	. $(VENV_DIR)/bin/activate && python -m pytest tests/test_model_performance.py -v
+	@echo "===================================================="
+	@. venv/bin/activate && python -m pytest tests/test_model_performance.py -v
+	@echo "===================================================="
 	@echo "✅ Performance tests complete."
+	@echo ""
+	@echo "📊 Generating performance report..."
+	@. venv/bin/activate && python -c "import mlflow; runs = mlflow.search_runs(); print(f'Latest run metrics: {runs.iloc[0]}')" || echo "No MLflow runs found"
 
 test-integration:
 	@echo "🔍 Running integration tests..."
-	. $(VENV_DIR)/bin/activate && python -m pytest tests/test_integration.py -v
+	. $(VENV_DIR)/bin/activate && python -m pytest tests/test_model_integration.py -v
 	@echo "✅ Integration tests complete."
 
 # Step 6: Evaluate the trained model
