@@ -15,10 +15,12 @@ def clear_mlflow_state():
     """
     Clear MLflow state before each test.
     """
-    mlflow.end_run()  # End any active run
-    mlflow.start_run()  # Start a new run
+    if mlflow.active_run():
+        mlflow.end_run()  # End any active run
+    # Don't start a new run here - let the tests or train_model handle that
     yield
-    mlflow.end_run()  # End the run after the test
+    if mlflow.active_run():
+        mlflow.end_run()  # End the run after the test
 
 def test_train_model_with_dummy_data():
     """
