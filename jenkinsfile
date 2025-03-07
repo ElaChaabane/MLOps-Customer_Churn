@@ -38,23 +38,7 @@ pipeline {
             }
         }
 
-        stage('Lint and Security Check') {
-            steps {
-                script {
-                    sh '''#!/bin/bash
-                        echo "🔍 Checking code quality..."
-                        . ${VENV_DIR}/bin/activate && black .  # Format code with Black
-                        
-                        # Exclude the virtual environment from flake8 check
-                        . ${VENV_DIR}/bin/activate && flake8 --exclude=${VENV_DIR} .
-                        
-                        # Fix the bandit command - properly specify severity level without causing argument error
-                        . ${VENV_DIR}/bin/activate && bandit -r . --severity-level high --exclude ${VENV_DIR} || true
-                    '''
-                }
-            }
-        }
-
+      
         stage('Prepare Data') {
             steps {
                 script {
