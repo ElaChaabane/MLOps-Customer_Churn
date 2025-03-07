@@ -19,20 +19,18 @@ pipeline {
             steps {
                 // Simple checkout for public repository
                 checkout scm
-                // Alternative if you need to specify the repository URL:
-                // git url: 'https://github.com/ElaChaabane/MLOps-Customer_Churn.git', branch: 'main'
             }
         }
 
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh '''
+                    sh '''#!/bin/bash
                         echo "🔄 Installing dependencies..."
-                        python3 -m venv venv  # Create a virtual environment
-                        source venv/bin/activate  # Activate the virtual environment
+                        python3 -m venv ${VENV_DIR}  # Create a virtual environment
+                        . ${VENV_DIR}/bin/activate  # Activate the virtual environment using dot instead of source
                         pip install --upgrade pip setuptools wheel  # Upgrade essential Python tools
-                        . ${VENV_DIR}/bin/activate && pip install -r requirements.txt  # Install dependencies
+                        pip install -r requirements.txt  # Install dependencies
                     '''
                 }
             }
@@ -41,7 +39,7 @@ pipeline {
         stage('Lint and Security Check') {
             steps {
                 script {
-                    sh '''
+                    sh '''#!/bin/bash
                         echo "🔍 Checking code quality..."
                         . ${VENV_DIR}/bin/activate && black .  # Format code with Black
                         . ${VENV_DIR}/bin/activate && flake8 .  # Linting with Flake8
@@ -55,7 +53,9 @@ pipeline {
             steps {
                 script {
                     // Runs data preprocessing (e.g., cleaning, feature engineering)
-                    sh ". ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --prepare"
+                    sh '''#!/bin/bash
+                        . ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --prepare
+                    '''
                 }
             }
         }
@@ -64,7 +64,9 @@ pipeline {
             steps {
                 script {
                     // Runs model training
-                    sh ". ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --train"
+                    sh '''#!/bin/bash
+                        . ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --train
+                    '''
                 }
             }
         }
@@ -73,7 +75,9 @@ pipeline {
             steps {
                 script {
                     // Runs unit tests on the model pipeline
-                    sh ". ${VENV_DIR}/bin/activate && pytest tests/test_model_pipeline.py -v"
+                    sh '''#!/bin/bash
+                        . ${VENV_DIR}/bin/activate && pytest tests/test_model_pipeline.py -v
+                    '''
                 }
             }
         }
@@ -82,7 +86,9 @@ pipeline {
             steps {
                 script {
                     // Evaluates model performance (e.g., accuracy, precision, recall)
-                    sh ". ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --evaluate"
+                    sh '''#!/bin/bash
+                        . ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --evaluate
+                    '''
                 }
             }
         }
@@ -91,7 +97,9 @@ pipeline {
             steps {
                 script {
                     // Saves the trained model to a file
-                    sh ". ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --save ${MODEL_FILE}"
+                    sh '''#!/bin/bash
+                        . ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --save ${MODEL_FILE}
+                    '''
                 }
             }
         }
@@ -117,14 +125,14 @@ pipeline {
         stage('Deploy MLflow Server') {
             steps {
                 script {
-                    sh '''
-                echo "🔄 Starting MLflow Server..."
-                mlflow server \
-                    --backend-store-uri ${MLFLOW_BACKEND_STORE} \
-                    --default-artifact-root ${MLFLOW_ARTIFACT_ROOT} \
-                    --host 0.0.0.0 \
-                    --port ${MLFLOW_PORT} &
-            '''
+                    sh '''#!/bin/bash
+                        echo "🔄 Starting MLflow Server..."
+                        . ${VENV_DIR}/bin/activate && mlflow server \
+                            --backend-store-uri ${MLFLOW_BACKEND_STORE} \
+                            --default-artifact-root ${MLFLOW_ARTIFACT_ROOT} \
+                            --host 0.0.0.0 \
+                            --port ${MLFLOW_PORT} &
+                    '''
                 }
             }
         }
