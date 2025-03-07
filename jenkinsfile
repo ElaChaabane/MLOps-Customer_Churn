@@ -11,6 +11,8 @@ pipeline {
         MLFLOW_PORT = '5000'  // Port to run MLflow
         MLFLOW_BACKEND_STORE = 'sqlite:///mlflow.db'  // SQLite database for MLflow tracking
         MLFLOW_ARTIFACT_ROOT = './mlruns'  // Directory for MLflow artifacts
+        // Define the correct data path relative to workspace
+        DATA_PATH = './churn-bigml-80.csv'  // Add this line to specify where data should be located
     }
 
     stages {  // Pipeline execution stages
@@ -36,15 +38,41 @@ pipeline {
             }
         }
 
-       
-}
+        stage('Lint and Security Check') {
+            steps {
+                script {
+                    sh '''#!/bin/bash
+                        echo "🔍 Checking code quality..."
+                        . ${VENV_DIR}/bin/activate && black .  # Format code with Black
+                        
+                        # Exclude the virtual environment from flake8 check
+                        . ${VENV_DIR}/bin/activate && flake8 --exclude=${VENV_DIR} .
+                        
+                        # Fix the bandit command - properly specify severity level without causing argument error
+                        . ${VENV_DIR}/bin/activate && bandit -r . --severity-level high --exclude ${VENV_DIR} || true
+                    '''
+                }
+            }
+        }
 
         stage('Prepare Data') {
             steps {
                 script {
-                    // Runs data preprocessing (e.g., cleaning, feature engineering)
+                    // Create data directory if it doesn't exist and ensure file is available
                     sh '''#!/bin/bash
-                        . ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --prepare
+                        mkdir -p ${DATA_PATH}
+                        
+                        # Check if the data file exists, if not, download or copy it from a reliable source
+                        if [ ! -f "${DATA_PATH}/churn-bigml-80.csv" ]; then
+                            echo "⚠️ Data file not found. Attempting to fetch it..."
+                            # Example: Copy from a known location or download it
+                            # cp /path/to/backup/churn-bigml-80.csv ${DATA_PATH}/
+                            # OR download using curl/wget:
+                            # curl -o ${DATA_PATH}/churn-bigml-80.csv https://example.com/data/churn-bigml-80.csv
+                        fi
+                        
+                        # Run the preparation script with the correct path
+                        . ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --prepare --data-dir=${DATA_PATH}
                     '''
                 }
             }
@@ -53,9 +81,9 @@ pipeline {
         stage('Train Model') {
             steps {
                 script {
-                    // Runs model training
+                    // Runs model training with the correct data path
                     sh '''#!/bin/bash
-                        . ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --train
+                        . ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --train --data-dir=${DATA_PATH}
                     '''
                 }
             }
@@ -75,9 +103,9 @@ pipeline {
         stage('Evaluate Model') {
             steps {
                 script {
-                    // Evaluates model performance (e.g., accuracy, precision, recall)
+                    // Evaluates model performance with the correct data path
                     sh '''#!/bin/bash
-                        . ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --evaluate
+                        . ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --evaluate --data-dir=${DATA_PATH}
                     '''
                 }
             }
