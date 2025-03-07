@@ -50,7 +50,7 @@ pipeline {
                         if [ ! -f "${DATA_PATH}/churn-bigml-80.csv" ]; then
                             echo "⚠️ Data file not found. Attempting to fetch it..."
                             # Example: Copy from a known location or download it
-                            # cp /path/to/backup/churn-bigml-80.csv ${DATA_PATH}/
+                             cp  ./churn-bigml-80.csv ${DATA_PATH}/
                             # OR download using curl/wget:
                             # curl -o ${DATA_PATH}/churn-bigml-80.csv https://example.com/data/churn-bigml-80.csv
                         fi
