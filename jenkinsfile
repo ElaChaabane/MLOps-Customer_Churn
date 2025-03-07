@@ -1,0 +1,132 @@
+pipeline {
+    agent any  // Runs the pipeline on any available Jenkins agent
+
+    // Define environment variables used throughout the pipeline
+    environment {
+        VENV_DIR = 'venv'  // Name of the virtual environment directory
+        TRAINING_SCRIPT = 'main.py'  // Main script for data processing and model training
+        MODEL_FILE = 'churn_model.joblib'  // Model output file
+        IMAGE_NAME = 'asinet/mlflow-server'  // Docker image name for MLflow
+        TAG = 'latest'  // Docker image tag
+        MLFLOW_PORT = '5000'  // Port to run MLflow
+        MLFLOW_BACKEND_STORE = 'sqlite:///mlflow.db'  // SQLite database for MLflow tracking
+        MLFLOW_ARTIFACT_ROOT = './mlruns'  // Directory for MLflow artifacts
+    }
+
+    stages {  // Pipeline execution stages
+
+        stage('Checkout') {  
+            steps {
+                // Simple checkout for public repository
+                checkout scm
+                // Alternative if you need to specify the repository URL:
+                // git url: 'https://github.com/ElaChaabane/MLOps-Customer_Churn.git', branch: 'main'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sh '''
+                        echo "🔄 Installing dependencies..."
+                        python3 -m venv venv  # Create a virtual environment
+                        source venv/bin/activate  # Activate the virtual environment
+                        pip install --upgrade pip setuptools wheel  # Upgrade essential Python tools
+                        . ${VENV_DIR}/bin/activate && pip install -r requirements.txt  # Install dependencies
+                    '''
+                }
+            }
+        }
+
+        stage('Lint and Security Check') {
+            steps {
+                script {
+                    sh '''
+                        echo "🔍 Checking code quality..."
+                        . ${VENV_DIR}/bin/activate && black .  # Format code with Black
+                        . ${VENV_DIR}/bin/activate && flake8 .  # Linting with Flake8
+                        . ${VENV_DIR}/bin/activate && bandit -r .  # Security scan with Bandit
+                    '''
+                }
+            }
+        }
+
+        stage('Prepare Data') {
+            steps {
+                script {
+                    // Runs data preprocessing (e.g., cleaning, feature engineering)
+                    sh ". ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --prepare"
+                }
+            }
+        }
+
+        stage('Train Model') {
+            steps {
+                script {
+                    // Runs model training
+                    sh ". ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --train"
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    // Runs unit tests on the model pipeline
+                    sh ". ${VENV_DIR}/bin/activate && pytest tests/test_model_pipeline.py -v"
+                }
+            }
+        }
+
+        stage('Evaluate Model') {
+            steps {
+                script {
+                    // Evaluates model performance (e.g., accuracy, precision, recall)
+                    sh ". ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --evaluate"
+                }
+            }
+        }
+
+        stage('Save Model') {
+            steps {
+                script {
+                    // Saves the trained model to a file
+                    sh ". ${VENV_DIR}/bin/activate && python ${TRAINING_SCRIPT} --save ${MODEL_FILE}"
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Builds a Docker image containing the ML model
+                    sh "docker build -t ${IMAGE_NAME}:${TAG} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Pushes the Docker image to a container registry
+                    sh "docker push ${IMAGE_NAME}:${TAG}"
+                }
+            }
+        }
+
+        stage('Deploy MLflow Server') {
+            steps {
+                script {
+                    sh '''
+                echo "🔄 Starting MLflow Server..."
+                mlflow server \
+                    --backend-store-uri ${MLFLOW_BACKEND_STORE} \
+                    --default-artifact-root ${MLFLOW_ARTIFACT_ROOT} \
+                    --host 0.0.0.0 \
+                    --port ${MLFLOW_PORT} &
+            '''
+                }
+            }
+        }
+    }
+}
